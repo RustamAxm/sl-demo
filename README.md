@@ -41,3 +41,17 @@ after run we can open capture data (example_capture.sal) in app
 File -> Open Capture
 
 ![](images/img.png)
+
+## Additional
+
+in code block strings should be same as settings in ui
+
+```python 
+            serial_analyzer = capture.add_analyzer('Async Serial', label=f'Test Analyzer', settings={
+                'Input Channel': 2,
+                'Bit Rate (Bits/s)': 115200,
+                'Bits per Frame': '8 Bits per Transfer (Standard)'
+            })
+```
+
+![](images/img_1.png)
