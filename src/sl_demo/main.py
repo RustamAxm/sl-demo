@@ -18,12 +18,14 @@ def main():
     logger.info("start connection")
 
     with Manager() as dev:
-        dev.configuration()
+        dev.configuration(
+            duration_seconds=2,
+        )
         for i in range(3):
             dev.start_capture_th()
             while dev.get_capture_th_status():
                 logger.info('in capture')
-                time.sleep(1)
+                time.sleep(0.2)
             dev.analyse_and_save()
 
 if __name__ == '__main__':
