@@ -6,7 +6,7 @@ from sl_demo import Manager
 from src.sl_demo.analyser import Analyser
 
 
-# @logger.catch
+@logger.catch
 def main():
     """
     # Connect to the running Logic 2 Application on port `10430`.
@@ -39,7 +39,9 @@ def main():
     )
     # load special sale data
     dev = Manager()
-    dev.load_capture(os.path.abspath('output-2025-08-16_22-24-12/example_capture.sal'))
+    dev.load_capture(
+        os.path.abspath('output-2025-08-16_22-24-12/example_capture.sal')
+    )
     dev.analyse_and_save()
     dev.close()
 
