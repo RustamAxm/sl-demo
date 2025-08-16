@@ -32,11 +32,7 @@ def main():
                 logger.info('in capture')
                 time.sleep(0.2)
             dev.analyse_and_save()
-    # load from csv
-    al = Analyser()
-    al.set_digital_csv(
-        digital_csv='output-2025-08-16_22-24-12/digital.csv',
-    )
+            
     # load special sale data
     dev = Manager()
     dev.load_capture(
