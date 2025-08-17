@@ -55,6 +55,22 @@ class Analyser:
         return dataframe
 
     def merge_dataframes(self):
-        self.dataframe_all = self.dataframe_a.merge(self.dataframe_dg, how='left', on='delta_time')
+        dataframe_a = self.dataframe_a.set_index('Time [s]')
+        dataframe_dg = self.dataframe_dg.set_index('Time [s]')
+        self.dataframe_all = pd.concat(
+            [dataframe_a, dataframe_dg],
+            axis=1,
+            sort=True,
+        )
+        self.dataframe_all = (self.dataframe_all.
+                              reset_index().
+                              rename(columns={'index': 'Time [s]'}).
+                              ffill())
+        self.dataframe_all['Time [s]'] = pd.to_datetime(self.dataframe_all['Time [s]'])
         logger.debug(f"\n{self.dataframe_all.head()}")
         logger.debug(f"{self.dataframe_all.columns}")
+
+    def get_all_dataframe_resample(self, resample_time='1ms'):
+        tmp = self.dataframe_all.set_index('Time [s]')
+        tmp = tmp.resample(resample_time).mean()
+        return tmp.reset_index()
