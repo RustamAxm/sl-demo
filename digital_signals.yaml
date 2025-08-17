@@ -1,9 +1,9 @@
 
 
 channels:
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 0" }
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 1" }
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 2" }
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 3" }
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 4" }
-  - { min: 10, max: 1000, unit: mcs, info: "Channel 5" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 0", name: "Channel 0" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 1", name: "Channel 1" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 2", name: "Channel 2" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 3", name: "Channel 3" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 4", name: "Channel 4" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 5", name: "Channel 5" }
