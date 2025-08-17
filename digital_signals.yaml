@@ -1,0 +1,9 @@
+
+
+channels:
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 0" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 1" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 2" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 3" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 4" }
+  - { min: 10, max: 1000, unit: mcs, info: "Channel 5" }

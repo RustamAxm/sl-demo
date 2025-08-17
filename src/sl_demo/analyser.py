@@ -37,11 +37,8 @@ class Analyser:
     def convert_to_datetime(dt_):
         return datetime.fromisoformat(dt_)
 
-    def add_datetime_column(self, data):
-        tmp = []
-        for item in data['Time [s]']:
-            delta = self.convert_to_datetime(item) - self.start_time
-            tmp.append(delta)
+    def add_timedelta_column(self, data):
+        tmp = pd.to_datetime(data['Time [s]']) - self.start_time
         return tmp
 
     def csv_operation(self, file_csv):
@@ -50,8 +47,8 @@ class Analyser:
 
         self.start_time = self.convert_to_datetime(dataframe['Time [s]'][0])
         logger.debug(f"{self.start_time=}, {type(self.start_time)}")
-        tmp = self.add_datetime_column(dataframe)
-        dataframe['delta_time'] = tmp
+        # tmp = self.add_timedelta_column(dataframe)
+        # dataframe['delta_time'] = tmp
         return dataframe
 
     def merge_dataframes(self):
@@ -81,3 +78,8 @@ class Analyser:
         tmp = self.dataframe_all.set_index('Time [s]')
         filtered_df = tmp.loc[start: end]
         return filtered_df
+
+    def get_first_digital_rising(self, ch_id='Channel 0'):
+        df = self.dataframe_dg
+        first_rise = df[df[ch_id] == 1].index[0]
+        return df.loc[first_rise, 'Time [s]']
