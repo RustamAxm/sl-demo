@@ -20,19 +20,18 @@ class Timings:
 class Analyser:
     def __init__(self):
         self.start_time = None
-        self.dataframe = None
+        self.dataframe_dg = None
+        self.dataframe_a = None
+        self.dataframe_all = None
 
     def set_digital_csv(self, digital_csv):
-        with open(digital_csv, 'r') as f:
-            dataframe = pd.read_csv(f)
+        self.dataframe_dg = self.csv_operation(digital_csv)
+        logger.debug(f"\n{self.dataframe_dg}")
 
-        self.start_time = self.convert_to_datetime(dataframe['Time [s]'][0])
-        logger.debug(f"{self.start_time=}, {type(self.start_time)}")
-        logger.debug(self.start_time > datetime.fromisoformat(dataframe['Time [s]'][1]))
-        tmp = self.add_datetime_column(dataframe)
-        dataframe['delta_time'] = tmp
-        self.dataframe = dataframe
-        logger.debug(f"\n{dataframe}")
+    def set_analog_csv(self, analog_csv):
+        self.dataframe_a = self.csv_operation(analog_csv)
+        self.dataframe_a = self.dataframe_a.rename(columns={'Channel 0': "ChannelA 0"})
+        logger.debug(f"\n{self.dataframe_a} \n{self.dataframe_a.columns}")
 
     @staticmethod
     def convert_to_datetime(dt_):
@@ -43,5 +42,19 @@ class Analyser:
         for item in data['Time [s]']:
             delta = self.convert_to_datetime(item) - self.start_time
             tmp.append(delta)
-        logger.debug(f"{tmp=}")
         return tmp
+
+    def csv_operation(self, file_csv):
+        with open(file_csv, 'r') as f:
+            dataframe = pd.read_csv(f)
+
+        self.start_time = self.convert_to_datetime(dataframe['Time [s]'][0])
+        logger.debug(f"{self.start_time=}, {type(self.start_time)}")
+        tmp = self.add_datetime_column(dataframe)
+        dataframe['delta_time'] = tmp
+        return dataframe
+
+    def merge_dataframes(self):
+        self.dataframe_all = self.dataframe_a.merge(self.dataframe_dg, how='left', on='delta_time')
+        logger.debug(f"\n{self.dataframe_all.head()}")
+        logger.debug(f"{self.dataframe_all.columns}")
