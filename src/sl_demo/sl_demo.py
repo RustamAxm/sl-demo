@@ -93,6 +93,7 @@ class Manager:
             }
         )
 
+
         # Store output in a timestamped directory
         output_dir = os.path.join(os.getcwd(), f'output-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}')
         os.makedirs(output_dir)
