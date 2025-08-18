@@ -1,20 +1,7 @@
-from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 
 import pandas as pd
 from loguru import logger
-
-
-@dataclass
-class Range:
-    min_: datetime
-    max_: datetime
-
-
-@dataclass
-class Timings:
-    ch0 = Range(min_=0, max_=1)
-    ch1 = Range(min_=0, max_=1)
 
 
 class Analyser:
@@ -30,7 +17,12 @@ class Analyser:
 
     def set_analog_csv(self, analog_csv):
         self.dataframe_a = self.csv_operation(analog_csv)
-        self.dataframe_a = self.dataframe_a.rename(columns={'Channel 0': "ChannelA 0"})
+        new_names = {}
+        for item in self.dataframe_a.columns:
+            if item == 'Time [s]':
+                continue
+            new_names[item] = f"A{item}"
+        self.dataframe_a = self.dataframe_a.rename(columns=new_names)
         logger.debug(f"\n{self.dataframe_a} \n{self.dataframe_a.columns}")
 
     @staticmethod
@@ -83,3 +75,16 @@ class Analyser:
         df = self.dataframe_dg
         first_rise = df[df[ch_id] == 1].index[0]
         return df.loc[first_rise, 'Time [s]']
+
+    @staticmethod
+    def check_signals(to_check, experiment_start='', ref_item=None):
+        start = datetime.fromisoformat(experiment_start)
+        to_check = datetime.fromisoformat(to_check)
+        logger.debug(f"{to_check - start}")
+
+        min_ = timedelta(microseconds=ref_item['min']) + start
+        max_ = timedelta(microseconds=ref_item['max']) + start
+        if min_ < to_check < max_:
+            return True
+        else:
+            return False
