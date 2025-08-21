@@ -6,12 +6,41 @@ readme = "README.md"
 authors = [
     { name = "Rustam Akhmadullin", email = "ru.akhmadullin@yadro.com" }
 ]
-requires-python = ">=3.12"
+requires-python = ">=3.12,<3.13"
 dependencies = [
     "logic2-automation>=1.0.7",
     "loguru>=0.7.3",
     "protobuf==5.29.0",
 ]
+[dependency-groups]
+dev = [
+    "pytest>=8.4.1",
+    "ruff>=0.11.6",
+    "setuptools>=80.9.0",
+    "sphinx-automodapi>=0.18.0",
+    "sphinx-rtd-theme>=3.0.2",
+    "sphinx-simplepdf>=1.6.0",
+    "sphinx>=8.2.3",
+    "sphinxcontrib-bibtex>=2.6.3",
+    "pytest-mock>=3.14.1",
+    "pytest-cov>=6.2.1",
+    "ty>=0.0.1a16",
+    "pre-commit>=4.2.0",
+    "pre-commit-hooks>=5.0.0",
+    "pytest-sugar>=1.0.0",
+    "poethepoet>=0.37.0",
+]
+
+
+[tool.poe.tasks]
+linter.shell = "ruff check src"
+html.shell = """rm -fr docs/build &&
+                sphinx-build -M html docs/source docs/build"""
+pdf.shell = """rm -fr docs/build &&
+               sphinx-build -M simplepdf docs/source docs/build"""
+api-rst.shell = """rm -fr docs/source/api &&
+                   sphinx-apidoc --module-first --implicit-namespaces --no-toc --force \
+                   -o docs/source/api src"""
 
 [project.scripts]
 serial-capture = "sl_demo.main:main"
