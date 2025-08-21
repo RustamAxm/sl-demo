@@ -33,6 +33,7 @@ class Manager:
         you can configure in the Logic 2 UI.
         :return:
         """
+        logger.debug(f"{duration_seconds=}")
         self.device_configuration = automation.LogicDeviceConfiguration(
             enabled_digital_channels=enabled_digital_channels,
             digital_sample_rate=digital_sample_rate,
@@ -73,20 +74,36 @@ class Manager:
             # Wait until the capture has finished
             # This will take about 5 seconds because we are using a timed capture mode
         self.capture.wait()
+        logger.debug(f'capture done {self.capture}')
 
     def analyse_and_save(self):
-        # Add an analyzer to the capture
-        # Note: The simulator output is not actual SPI data
-        serial_analyzer = self.capture.add_analyzer('Async Serial', label=f'Test Analyzer', settings={
-            'Input Channel': 2,
-            'Bit Rate (Bits/s)': 115200,
-            'Bits per Frame': '8 Bits per Transfer (Standard)'
-        })
+        """
+        Add an analyzer to the capture
+        Note: The simulator output is not actual Serial data
+        :return:
+        """
+
+        serial_analyzer = self.capture.add_analyzer(
+            'Async Serial',
+            label=f'Test Analyzer',
+            settings={
+                'Input Channel': 2,
+                'Bit Rate (Bits/s)': 115200,
+                'Bits per Frame': '8 Bits per Transfer (Standard)',
+            }
+        )
 
         # Store output in a timestamped directory
         output_dir = os.path.join(os.getcwd(), f'output-{datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}')
         os.makedirs(output_dir)
 
+        # Export raw digital data to a CSV file
+        self.capture.export_raw_data_csv(
+            directory=output_dir,
+            digital_channels=[0, 2],
+            iso8601_timestamp=True,
+        )
+        logger.info(f'Export raw digital data to a CSV file {output_dir=}')
         # Export analyzer data to a CSV file
         analyzer_export_filepath = os.path.join(output_dir, 'serial_export.csv')
         self.capture.export_data_table(
@@ -95,10 +112,6 @@ class Manager:
         )
         logger.info(f'Export analyzer data to a CSV file {analyzer_export_filepath=}')
 
-        # Export raw digital data to a CSV file
-        self.capture.export_raw_data_csv(directory=output_dir, digital_channels=[0, 2])
-        logger.info(f'Export raw digital data to a CSV file {output_dir=}')
-
         # Finally, save the capture to a file
         capture_filepath = os.path.join(output_dir, 'example_capture.sal')
         self.capture.save_capture(filepath=capture_filepath)
@@ -106,3 +119,7 @@ class Manager:
 
         self.capture.close()
         self.capture = None
+
+    def load_capture(self, file_path):
+        if file_path.endswith('sal'):
+            self.capture = self.manager.load_capture(file_path)
