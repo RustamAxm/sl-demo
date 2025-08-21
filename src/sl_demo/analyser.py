@@ -74,3 +74,10 @@ class Analyser:
         tmp = self.dataframe_all.set_index('Time [s]')
         tmp = tmp.resample(resample_time).mean()
         return tmp.reset_index()
+
+    def get_filtered_time(self, start, end):
+        start = pd.Timestamp(start)
+        end = pd.Timestamp(end)
+        tmp = self.dataframe_all.set_index('Time [s]')
+        filtered_df = tmp.loc[start: end]
+        return filtered_df
