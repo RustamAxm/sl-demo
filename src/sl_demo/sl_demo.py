@@ -3,8 +3,9 @@ import threading
 from datetime import datetime
 
 from loguru import logger
-from numpy.ma.core import true_divide
 from saleae import automation
+
+from src.sl_demo.valid_pares_ import VALID_PARE
 
 
 class Manager:
@@ -45,8 +46,11 @@ class Manager:
         :return:
         """
         logger.debug(f"{duration_seconds=}")
-        if self._check_inputs():
+        if self._check_inputs(digital_sample_rate, analog_sample_rate):
             logger.debug(f"digital and analog sample rates is OK")
+        else:
+            raise ValueError(f"digital and analog sample rates is ERR "
+                             f"{analog_sample_rate=} {digital_sample_rate=}")
 
         self.device_configuration = automation.LogicDeviceConfiguration(
             enabled_digital_channels=enabled_digital_channels,
@@ -70,8 +74,24 @@ class Manager:
             self.th.join()
             return False
 
-    def _check_inputs(self):
-        return True
+    def _check_inputs(self, digital_sample_rate, analog_sample_rate):
+        if analog_sample_rate < 625000:
+            raise ValueError(f"analog_sample_rate < 625000, {analog_sample_rate=}")
+
+        pares = self.get_pare(digital_sample_rate)
+        for pare in pares:
+            if pare['analog'] == analog_sample_rate:
+                return True
+        logger.error(f"no pare")
+        return False
+
+    def get_pare(self, digital_sample_rate):
+        pares = []
+        for pare in VALID_PARE:
+            if pare['digital'] == digital_sample_rate:
+                pares.append(pare)
+        return pares
+
 
     def _start_capture(self):
         """
