@@ -48,14 +48,23 @@ def main():
     end = datetime.datetime.fromisoformat(end)
     logger.info(f"{al.get_filtered_time(start, end)}")
 
-    first_r = al.get_first_digital_rising()
-    logger.info(f"{first_r=}")
+
     with open('digital_signals.yaml', 'r') as f:
         config = yaml.safe_load(f)
+
+    exp_start = '2025-08-17T07:59:59.829076240+00:00'
     for item in config['channels']:
+        try:
+            first_r = al.get_first_digital_rising(
+                ch_id=item['name']
+            )
+        except Exception as ex:
+            logger.warning(f'{ex=}')
+            continue
+        logger.info(f"{first_r=}")
         check_signals(
             to_check=first_r,
-            exp_start='2025-08-17T07:59:59.829076240+00:00',
+            exp_start=exp_start,
             ref_item=item,
         )
 
