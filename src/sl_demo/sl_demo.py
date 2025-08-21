@@ -121,5 +121,7 @@ class Manager:
         self.capture = None
 
     def load_capture(self, file_path):
+        if not os.path.isabs(file_path):
+            raise ValueError(f"not full path {file_path=}")
         if file_path.endswith('sal'):
             self.capture = self.manager.load_capture(file_path)
