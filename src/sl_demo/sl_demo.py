@@ -1,13 +1,23 @@
 import os
 import threading
 from datetime import datetime
+from wsgiref.validate import check_input
 
 from loguru import logger
+from numpy.ma.core import true_divide
 from saleae import automation
 
 
 class Manager:
     def __init__(self):
+        """
+        Connect to the running Logic 2 Application on port `10430`.
+        Alternatively you can use automation.Manager.launch() to launch a new Logic 2 process - see
+        the API documentation for more details.
+        Using the `with` statement will automatically call manager.close() when exiting the scope. If you
+        want to use `automation.Manager` outside of a `with` block, you will need to call `manager.close()` manually.
+        :return:
+        """
         self.manager = automation.Manager.connect(port=10430)
         self.device_id = "F4243" #'A7D1BB81883C0092'
 
@@ -23,7 +33,9 @@ class Manager:
     def configuration(
             self,
             enabled_digital_channels=[0, 2],
-            digital_sample_rate=1_000_000,
+            enabled_analog_channels=[0],
+            digital_sample_rate=25000000,
+            analog_sample_rate=625000,
             duration_seconds=5.0,
     ):
         """
@@ -34,9 +46,14 @@ class Manager:
         :return:
         """
         logger.debug(f"{duration_seconds=}")
+        if self._check_inputs():
+            logger.debug(f"digital and analog sample rates is OK")
+
         self.device_configuration = automation.LogicDeviceConfiguration(
             enabled_digital_channels=enabled_digital_channels,
+            enabled_analog_channels=enabled_analog_channels,
             digital_sample_rate=digital_sample_rate,
+            analog_sample_rate=analog_sample_rate,
         )
         # Record 5 seconds of data before stopping the capture
         self.capture_configuration = automation.CaptureConfiguration(
@@ -54,14 +71,21 @@ class Manager:
             self.th.join()
             return False
 
+    def _check_inputs(self):
+        return True
+
     def _start_capture(self):
         """
         Start a capture - the capture will be automatically closed when leaving the `with` block
-        Note: The serial number 'F4241' is for the Logic Pro 16 demo device.
-              To use a real device, you can:
-                1. Omit the `device_id` argument. Logic 2 will choose the first real (non-simulated) device.
-                2. Use the serial number for your device. See the "Finding the Serial Number
-                   of a Device" section for information on finding your device's serial number.
+
+        Note:
+
+           The serial number 'F4241' is for the Logic Pro 16 demo device.
+           To use a real device, you can:
+            1. Omit the `device_id` argument. Logic 2 will choose the first real (non-simulated) device.
+            2. Use the serial number for your device. See the "Finding the Serial Number
+               of a Device" section for information on finding your device's serial number.
+
         :return:
         """
 
@@ -101,7 +125,8 @@ class Manager:
         # Export raw digital data to a CSV file
         self.capture.export_raw_data_csv(
             directory=output_dir,
-            digital_channels=[0, 2],
+            digital_channels=self.device_configuration.enabled_digital_channels,
+            analog_channels=self.device_configuration.enabled_analog_channels,
             iso8601_timestamp=True,
         )
         logger.info(f'Export raw digital data to a CSV file {output_dir=}')
