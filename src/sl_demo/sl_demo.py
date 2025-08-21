@@ -78,14 +78,15 @@ class Manager:
         if analog_sample_rate < 625000:
             raise ValueError(f"analog_sample_rate < 625000, {analog_sample_rate=}")
 
-        pares = self.get_pare(digital_sample_rate)
+        pares = self.get_pares(digital_sample_rate)
         for pare in pares:
             if pare['analog'] == analog_sample_rate:
                 return True
         logger.error(f"no pare")
         return False
 
-    def get_pare(self, digital_sample_rate):
+    @staticmethod
+    def get_pares(digital_sample_rate):
         pares = []
         for pare in VALID_PARE:
             if pare['digital'] == digital_sample_rate:
