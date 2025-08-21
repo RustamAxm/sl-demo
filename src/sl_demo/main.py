@@ -3,8 +3,6 @@ import time
 from datetime import datetime
 from loguru import logger
 from sl_demo import Manager
-from src.sl_demo.analyser import Analyser
-
 
 @logger.catch
 def main():
