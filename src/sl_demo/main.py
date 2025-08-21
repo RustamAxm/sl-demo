@@ -32,14 +32,7 @@ def main():
                 logger.info('in capture')
                 time.sleep(0.2)
             dev.analyse_and_save()
-            
-    # load special sale data
-    dev = Manager()
-    dev.load_capture(
-        os.path.abspath('output-2025-08-16_22-24-12/example_capture.sal')
-    )
-    dev.analyse_and_save()
-    dev.close()
+
 
 
 if __name__ == '__main__':
